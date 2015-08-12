@@ -3,47 +3,7 @@
 #include <time.h>
 #include <unistd.h>
 
-int findGCD_v1(int a, int b) {
-        while (1) {
-                if (a > b) a -= b;
-                else if (a < b) b -= a;
-                else return a;
-        }
-}
-
-int findGCD_v2(int a, int b) {
-        while (1) {
-                a %= b;
-                if (a == 0) return b;
-                if (a == 1) return 1;
-                b %= a;
-                if (b == 0) return a;
-                if (b == 1) return 1;
-        }
-}
-
-int findGCD_v3(int a, int b) {
-        while (1) {
-                if (a > (b * 4)) {
-                        a %= b;
-                        if (a == 0) return b;
-                        if (a == 1) return 1;
-                } else if (a >= b) {
-                        a -= b;
-                        if (a == 0) return b;
-                        if (a == 1) return 1;
-                }
-                if (b > (a * 4)) {
-                        b %= a;
-                        if (b == 0) return a;
-                        if (b == 1) return 1;
-                } else if (b >= a) {
-                        b -= a;
-                        if (b == 0) return a;
-                        if (b == 1) return 1;
-                }
-        }
-}
+#include "findgcd.h"
 
 struct timespec diff(struct timespec start, struct timespec end)
 {
@@ -58,33 +18,30 @@ struct timespec diff(struct timespec start, struct timespec end)
         return temp;
 }
 
+#define RANGE_MIN 2
+#define RANGE_MAX 9999
+
 int main(int argc, char *argv[])
 {
-        int a = 5000;
-        int b = 2323;
-
         struct timespec t_start, t_end;
         clock_t start, stop;
         double elapsed;
 
-
-        int i, j;
-#define MAX 9999
-#define MIN 2
-
-        clock_gettime(CLOCK_MONOTONIC, &t_start);
-        for (i = MIN; i < MAX; i++) {
-                for (j = MIN; i < MAX; i++) {
+        // initial
+        for (int i = RANGE_MIN; i < RANGE_MAX; i++) {
+                clock_gettime(CLOCK_MONOTONIC, &t_start);
+                for (int j = RANGE_MIN; j < RANGE_MAX; j++) {
                         findGCD_v1(i, j);
                 }
+                clock_gettime(CLOCK_MONOTONIC, &t_end);
+                printf("%d %f\n", i,  diff(t_start, t_end).tv_nsec/ 1000.0);
         }
-        clock_gettime(CLOCK_MONOTONIC, &t_end);
 
+#if 0
         printf("Time elapsed in us: %d\n", (int) diff(t_start, t_end).tv_nsec);
-
         clock_gettime(CLOCK_MONOTONIC, &t_start);
-        for (i = MIN; i < MAX; i++) {
-                for (j = MIN; i < MAX; i++) {
+        for (i = RANGE_MIN; i < RANGE_MAX; i++) {
+                for (j = RANGE_MIN; i < RANGE_MAX; i++) {
                         findGCD_v2(i, j);
                 }
         }
@@ -93,14 +50,14 @@ int main(int argc, char *argv[])
         printf("Time elapsed in us: %d\n", (int) diff(t_start, t_end).tv_nsec);
 
         clock_gettime(CLOCK_MONOTONIC, &t_start);
-        for (i = MIN; i < MAX; i++) {
-                for (j = MIN; i < MAX; i++) {
+        for (i = RANGE_MIN; i < RANGE_MAX; i++) {
+                for (j = RANGE_MIN; i < RANGE_MAX; i++) {
                         findGCD_v3(i, j);
                 }
         }
         clock_gettime(CLOCK_MONOTONIC, &t_end);
 
         printf("Time elapsed in us: %d\n", (int) diff(t_start, t_end).tv_nsec);
-
+#endif
         return 0;
 }
