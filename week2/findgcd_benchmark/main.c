@@ -14,20 +14,23 @@
 #error "No such findgcd method"
 #endif
 
-#define RANGE_MAX 10000
-
 int main(int argc, char* argv[])
 {
-        clock_t begin;
+        if (argc != 2 ) {
+                printf("Usage: %s <range>\n", argv[0]);
+                return 0;
+        }
 
-        begin = clock();
-        for(int i = 2;i < RANGE_MAX; i++){
-                for(int j = i + 1 ;j < RANGE_MAX; j++){
+        unsigned int range_max = atoi(argv[1]);
+
+        clock_t begin = clock();
+        for(int i = 2;i < range_max + 1; i++){
+                for(int j = i + 1 ;j < range_max + 1; j++){
                         FINDGCD(i,j);
                 }
         }
 
-        printf("%s finished in range 2 ~ %d, time elapsed: %f\n", argv[0] , RANGE_MAX - 1,
+        printf("%s finished in range 2 ~ %d, time elapsed: %f\n", argv[0] , range_max,
                (double) (clock() - begin) / CLOCKS_PER_SEC);
 
         return 0;
