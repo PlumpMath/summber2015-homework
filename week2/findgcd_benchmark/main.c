@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
                 }
         }
 
-        printf("%s finished in range 2 ~ %d, time elapsed: %f\n", argv[0] , range_max,
+        printf("%s finished in range 2 ~ %d and time elapsed: %f\n", argv[0] , range_max,
                (double) (clock() - begin) / CLOCKS_PER_SEC);
 
         return 0;
