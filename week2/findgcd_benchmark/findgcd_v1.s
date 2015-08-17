@@ -12,18 +12,17 @@ findGCDv1:
   @ PROLOG
   push {lr}
 
-  @ R0 = a, R1 = b
-  @ R0 == R1: goto .return
-  cmp r0, r1
-  beq .return_a
-
-  @ R0 > R1 => a -= b
+  @ R0 > R1 -> a -= b
   subs r0, r0, r1
   bgt .findGCDv1
 
-  @ R0 < R1 => b -= a
+  @ R0 < R1 -> b -= a
   subs r1, r1, r0
   bgt .findGCDv1
+
+  @ R0 = a, R1 = b -> return
+  cmp r0, r1
+  beq .return
 
 .return:
   pop {pc}    @ EPILOG
