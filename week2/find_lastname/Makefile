@@ -7,7 +7,7 @@ CFLAGS = -Wall -Werror -std=gnu99 -O0
 
 all: $(BIN)
 
-findLastname: findgcd.c main.c
+findLastname: phonebook.c main.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:

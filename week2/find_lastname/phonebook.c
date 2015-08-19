@@ -19,5 +19,5 @@ PhoneBook *findName(char lastName[], PhoneBook *pHead)
 
 PhoneBook *appendName(char lastName[], PhoneBook *pHead)
 {
-
+        return NULL;
 }
