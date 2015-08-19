@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,8 +8,10 @@ PhoneBook *findName(char lastName[], PhoneBook *pHead)
 {
         while (pHead != NULL) {
                 // case insensitive
-                if (0 == strcasecmp(lastName, pHead->lastName))
+                if (0 == strcasecmp(lastName, pHead->lastName)) {
+                        printf("Find lastName!!\n");
                         return pHead;
+                }
                 pHead = pHead->pNext;
         }
 
@@ -19,5 +20,10 @@ PhoneBook *findName(char lastName[], PhoneBook *pHead)
 
 PhoneBook *appendName(char lastName[], PhoneBook *pHead)
 {
-        return NULL;
+        pHead->pNext = (PhoneBook *) malloc(sizeof(PhoneBook));
+        pHead = pHead->pNext;
+        strcpy(pHead->lastName, lastName);
+        pHead->pNext = NULL;
+
+        return pHead;
 }
