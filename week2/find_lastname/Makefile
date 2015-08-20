@@ -9,6 +9,5 @@ all: $(BIN)
 
 findLastname: phonebook.c main.c
 	$(CC) $(CFLAGS) -o $@ $^ -DPHONEBOOK_ORIGIN
-
 clean:
 	$(RM) $(BIN)
