@@ -1,6 +1,6 @@
 BIN = toGray_v0 toGray_v1 toGray_v2 toGray_v3
 
-CFLAGS = -Wall -Werror -std=gnu99 -O0
+CFLAGS = -Wall -Werror -std=gnu99 -O0 -g
 LDFLAGS = `pkg-config --libs --cflags libpng`
 
 all: $(BIN)
