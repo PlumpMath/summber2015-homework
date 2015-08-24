@@ -2,4 +2,4 @@
 NOTE
 ==============
 
-You need to install libjpeg for building this application.
+You need to install libpng for building this application.
