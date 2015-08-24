@@ -1,17 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define PNG_DEBUG 3
 #include <png.h>
 
+#if defined(TOGRAY_V0)
+#define OUTPUT "gray_v0.png"
+#elif defined(TOGRAY_V1)
+#define OUTPUT "gray_v1.png"
+#else
+#error "See makefile"
+#endif
+
 /* some file local variable to save tmp image */
 static int width = 0;
 static int height = 0;
+static int stride = 0;
 
 static png_bytep *row_pointers;
 static png_byte color_type;
 static png_byte bit_depth;
-
 
 /* original version */
 void rgba_to_bw(uint32_t *bitmap, int width, int height, long stride)
@@ -20,13 +29,14 @@ void rgba_to_bw(uint32_t *bitmap, int width, int height, long stride)
         uint32_t pixel, r, g, b, a, bw;
         for (row = 0; row < height; row++) {
                 for (col = 0; col < width; col++) {
-                        pixel = bitmap[col + row + stride / 4];
+                        pixel = bitmap[col + row * stride / 4];
+
                         a = (pixel >> 24) & 0xff;
                         r = (pixel >> 16) & 0xff;
                         g = (pixel >> 8) & 0xff;
                         b = pixel & 0xff;
                         bw = (uint32_t) (r * 0.299 + g * 0.587 + b * 0.114);
-                        bitmap[col + row * stride / 4] = (a << 24) + (bw << 16) + (bw << 8) + (bw);
+                        bitmap[col + row * stride / 4 ] = (a << 24) + (bw << 16) + (bw << 8) + (bw);
                 }
         }
 }
@@ -103,9 +113,13 @@ void read_image(const char* filename)
 
         png_read_update_info(png, info);
 
+        stride = png_get_rowbytes(png, info);
+        png_bytep pixels = (png_bytep) malloc(height * stride);
+
         row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
         for(int y = 0; y < height; y++) {
-                row_pointers[y] = (png_byte*)malloc(png_get_rowbytes(png,info));
+//                row_pointers[y] = (png_byte*)malloc(png_get_rowbytes(png,info));
+                row_pointers[y] = pixels + stride * y;
         }
 
         png_read_image(png, row_pointers);
@@ -143,12 +157,16 @@ void write_image(const char *filename)
                 PNG_FILTER_TYPE_DEFAULT);
         png_write_info(png, info);
 
+
         png_write_image(png, row_pointers);
+
         png_write_end(png, NULL);
 
-        for(int y = 0; y < height; y++) {
-                free(row_pointers[y]);
-        }
+        // FIXME:
+        // malloc: *** error for object 0x1066fe960: pointer being freed was not allocated
+        // for(int y = 0; y < height; y++) {
+        //         free(row_pointers[y]);
+        // }
         free(row_pointers);
 
         fclose(fp);
@@ -156,12 +174,13 @@ void write_image(const char *filename)
 
 void process_image()
 {
+        rgba_to_bw((uint32_t *) *row_pointers, width, height, stride);
 }
 
 int main(int argc, char *argv[])
 {
         read_image("sample.png");
         process_image();
-        write_image("sample_grey.png");
+        write_image(OUTPUT);
         return 0;
 }

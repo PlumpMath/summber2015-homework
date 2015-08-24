@@ -12,4 +12,4 @@ toGray_v1: main.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -DTOGRAY_V1
 
 clean:
-	$(RM) $(BIN)
+	$(RM) $(BIN) gray_v*.png
