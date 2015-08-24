@@ -229,7 +229,7 @@ void write_image(const char *filename)
         // for(int y = 0; y < height; y++) {
         //         free(row_pointers[y]);
         // }
-//        free(row_pointers);
+        free(row_pointers);
 
         fclose(fp);
 }
