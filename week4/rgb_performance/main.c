@@ -1,17 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <time.h>
 
 #define PNG_DEBUG 3
 #include <png.h>
 
-#if defined(TOGRAY_V0)
-#define OUTPUT "gray_v0.png"
-#elif defined(TOGRAY_V1)
-#define OUTPUT "gray_v1.png"
-#else
-#error "See makefile"
-#endif
 
 /* some file local variable to save tmp image */
 static int width = 0;
@@ -21,6 +15,18 @@ static int stride = 0;
 static png_bytep *row_pointers;
 static png_byte color_type;
 static png_byte bit_depth;
+
+
+/* prebuilt table */
+uint32_t mul_299[] = {
+
+};
+uint32_t mul_587[] = {
+
+};
+uint32_t mul_144[] = {
+
+};
 
 /* original version */
 void rgba_to_bw(uint32_t *bitmap, int width, int height, long stride)
@@ -41,8 +47,64 @@ void rgba_to_bw(uint32_t *bitmap, int width, int height, long stride)
         }
 }
 
-/* optimize version v1 */
+/* optimize version v1
+ *
+ * change:
+ *
+ *  1. for i++   -> for i--
+ */
 void rgba_to_bw_v1(uint32_t *bitmap, int width, int height, long stride)
+{
+        int row, col;
+        uint32_t pixel, r, g, b, a, bw;
+        for (row = height; row != 0; row--) {
+                for (col = width; col != 0; col--) {
+                        pixel = bitmap[col + row * stride / 4];
+
+                        a = (pixel >> 24) & 0xff;
+                        r = (pixel >> 16) & 0xff;
+                        g = (pixel >> 8) & 0xff;
+                        b = pixel & 0xff;
+                        bw = (uint32_t) (r * 0.299 + g * 0.587 + b * 0.114);
+                        bitmap[col + row * stride / 4 ] = (a << 24) + (bw << 16) + (bw << 8) + (bw);
+                }
+        }
+}
+
+/* optimize version v2
+ *
+ * change:
+ *
+ *  1. for i++   -> for i--
+ *  2. int tmp = col + row * stride / 4;
+ */
+void rgba_to_bw_v2(uint32_t *bitmap, int width, int height, long stride)
+{
+        int row, col;
+        uint32_t pixel, r, g, b, a, bw;
+        for (row = height; row != 0; row--) {
+                for (col = width; col != 0; col--) {
+                        int tmp = col + row * stride / 4;
+                        pixel = bitmap[tmp];
+                        a = (pixel >> 24) & 0xff;
+                        r = (pixel >> 16) & 0xff;
+                        g = (pixel >> 8) & 0xff;
+                        b = pixel & 0xff;
+                        bw = (uint32_t) (r * 0.299 + g * 0.587 + b * 0.114);
+                        bitmap[tmp] = (a << 24) + (bw << 16) + (bw << 8) + (bw);
+                }
+        }
+}
+
+/* optimize version v3
+ *
+ * change:
+ *
+ *  1. for i++   -> for i--
+ *  2. int tmp = col + row * stride / 4;
+ *  3. use table for: bw = (uint32_t) (r * 0.299 + g * 0.587 + b * 0.114);
+ */
+void rgba_to_bw_v2(uint32_t *bitmap, int width, int height, long stride)
 {
         int row, col;
         uint32_t pixel, r, g, b, a, bw;
@@ -175,9 +237,20 @@ void write_image(const char *filename)
 void process_image()
 {
 #if defined(TOGRAY_V0)
+#define OUTPUT "gray_v0.png"
         rgba_to_bw((uint32_t *) *row_pointers, width, height, stride);
+
 #elif defined(TOGRAY_V1)
+#define OUTPUT "gray_v1.png"
         rgba_to_bw_v1((uint32_t *) *row_pointers, width, height, stride);
+
+#elif defined(TOGRAY_V2)
+#define OUTPUT "gray_v2.png"
+        rgba_to_bw_v2((uint32_t *) *row_pointers, width, height, stride);
+
+#elif defined(TOGRAY_V3)
+#define OUTPUT "gray_v3.png"
+        rgba_to_bw_v3((uint32_t *) *row_pointers, width, height, stride);
 #else
 #error "See makefile"
 #endif
@@ -186,7 +259,11 @@ void process_image()
 int main(int argc, char *argv[])
 {
         read_image("sample.png");
+
+        clock_t begin = clock();
         process_image();
+        printf("process image time elapsed: %f\n", (double) (clock() - begin) / CLOCKS_PER_SEC);
+
         write_image(OUTPUT);
         return 0;
 }
