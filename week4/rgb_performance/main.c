@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define PNG_DEBUG 3
+#include <png.h>
+
 #include "rgb.h"
 
 /* original version */
