@@ -57,8 +57,8 @@ void rgba_to_bw_v1(uint32_t *bitmap, int width, int height, long stride)
 {
         int row, col;
         uint32_t pixel, r, g, b, a, bw;
-        for (row = height; row != 0; row--) {
-                for (col = width; col != 0; col--) {
+        for (row = height - 1; row + 1 != 0; row--) {
+                for (col = width - 1; col + 1 != 0; col--) {
                         pixel = bitmap[col + row * stride / 4];
 
                         a = (pixel >> 24) & 0xff;
@@ -82,8 +82,8 @@ void rgba_to_bw_v2(uint32_t *bitmap, int width, int height, long stride)
 {
         int row, col;
         uint32_t pixel, r, g, b, a, bw;
-        for (row = height; row != 0; row--) {
-                for (col = width; col != 0; col--) {
+        for (row = height - 1; row + 1 != 0; row--) {
+                for (col = width - 1; col + 1 != 0; col--) {
                         int tmp = col + row * stride / 4;
                         pixel = bitmap[tmp];
                         a = (pixel >> 24) & 0xff;
@@ -108,8 +108,8 @@ void rgba_to_bw_v3(uint32_t *bitmap, int width, int height, long stride)
 {
         int row, col;
         uint32_t pixel, r, g, b, a, bw;
-        for (row = height; row != 0; row--) {
-                for (col = width; col != 0; col--) {
+        for (row = height - 1; row + 1 != 0; row--) {
+                for (col = width - 1; col + 1 != 0; col--) {
                         int tmp = col + row * stride / 4;
                         pixel = bitmap[tmp];
                         a = (pixel >> 24) & 0xff;
