@@ -48,7 +48,7 @@ void rgba_to_bw_v1(uint32_t *bitmap, int width, int height, long stride)
         uint32_t pixel, r, g, b, a, bw;
         for (row = height; row != 0; row--) {
                 for (col = width; col != 0; col--) {
-                        int tmp = col + row + stride / 4;
+                        int tmp = col + row * stride / 4;
                         pixel = bitmap[tmp];
                         a = (pixel >> 24) & 0xff;
                         r = (pixel >> 16) & 0xff;
@@ -174,7 +174,13 @@ void write_image(const char *filename)
 
 void process_image()
 {
+#if defined(TOGRAY_V0)
         rgba_to_bw((uint32_t *) *row_pointers, width, height, stride);
+#elif defined(TOGRAY_V1)
+        rgba_to_bw_v1((uint32_t *) *row_pointers, width, height, stride);
+#else
+#error "See makefile"
+#endif
 }
 
 int main(int argc, char *argv[])
