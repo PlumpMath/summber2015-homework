@@ -28,6 +28,18 @@ unsigned char mul_144[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 17, 17, 17, 17, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20, 20, 20, 20, 20, 20, 20, 20, 20, 21, 21, 21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23, 23, 23, 23, 23, 23, 23, 23, 23, 24, 24, 24, 24, 24, 24, 24, 24, 24, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 26, 26, 26, 26, 26, 26, 26, 27, 27, 27, 27, 27, 27, 27, 27, 27, 28, 28, 28, 28, 28, 28, 28, 28, 28, 29,
 };
 
+/* compress */
+unsigned char mul_299_c[] = {
+        18, 37, 56, 75, 93, 112, 131,
+};
+unsigned char mul_587_c[] = {
+        3, 7, 10, 14, 18, 21, 25,
+};
+unsigned char mul_144_c[] = {
+        3, 7, 10, 14, 18, 21, 25,
+};
+
+
 /* original version */
 void rgba_to_bw(uint32_t *bitmap, int width, int height, long stride)
 {
@@ -107,17 +119,17 @@ void rgba_to_bw_v2(uint32_t *bitmap, int width, int height, long stride)
 void rgba_to_bw_v3(uint32_t *bitmap, int width, int height, long stride)
 {
         int row, col;
-        uint32_t pixel, r, g, b, a, bw;
+        uint32_t pixel, r, g, b,  bw;
         for (row = height - 1; row + 1 != 0; row--) {
                 for (col = width - 1; col + 1 != 0; col--) {
                         int tmp = col + row * stride / 4;
                         pixel = bitmap[tmp];
-                        a = (pixel >> 24) & 0xff;
+                        //a = (pixel >> 24) & 0xff;
                         r = (pixel >> 16) & 0xff;
                         g = (pixel >> 8) & 0xff;
                         b = pixel & 0xff;
                         bw = (uint32_t) mul_299[r] + (uint32_t) mul_587[g] + (uint32_t) mul_144[b];
-                        bitmap[tmp] = (a << 24) + (bw << 16) + (bw << 8) + (bw);
+                        bitmap[tmp] = (pixel & 0xff000000) + (bw << 16) + (bw << 8) + (bw);
                 }
         }
 }
@@ -272,6 +284,17 @@ int main(int argc, char *argv[])
                 r = i * 0.587;
                 //r = i * 0.114;
                 //r = i * 0.114;
+                printf("%d, ", r);
+        }
+        printf("\n");
+#endif
+
+#if 0
+        int r = 0;
+        for (int i = 1; i < 8; i ++) {
+                r = (i << 5) * 0.587;
+                // r = (i << 5) * 0.114;
+                // r = (i << 5) * 0.114;
                 printf("%d, ", r);
         }
         printf("\n");
