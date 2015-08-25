@@ -142,14 +142,11 @@ void rgba_to_bw(uint32_t *bitmap, int width, int height, long stride)
 /* compress */
 unsigned char mul_299_c[] = {
         0, 4, 9, 14, 19, 23, 28, 33, 38, 43, 47, 52, 57, 62, 66, 71,
-//        0, 18, 37, 56, 75, 93, 112, 131,
 };
 unsigned char mul_587_c[] = {
         0, 9, 18, 28, 37, 46, 56, 65, 75, 84, 93, 103, 112, 122, 131, 140,
-//        0, 3, 7, 10, 14, 18, 21, 25,
 };
 unsigned char mul_144_c[] = {
-//        0, 3, 7, 10, 14, 18, 21, 25,
         0, 2, 4, 6, 9, 11, 13, 16, 18, 20, 23, 25, 27, 29, 32, 34,
 };
 
@@ -171,8 +168,8 @@ void rgba_to_bw(uint32_t *bitmap, int width, int height, long stride)
                         int tmp = col + row * stride / 4;
                         pixel = bitmap[tmp];
                         //a = (pixel >> 24) & 0xff;
-                        r = (pixel & 0x00ff0000) >> 20; // 16 + 5
-                        g = (pixel & 0x0000ff00) >> 12;  // 8 + 5
+                        r = (pixel & 0x00ff0000) >> 20; // 16 + 4
+                        g = (pixel & 0x0000ff00) >> 12;  // 8 + 4
                         b = (pixel & 0x000000ff) >> 4;
                         bw = (uint32_t) mul_299_c[r] + (uint32_t) mul_587_c[g] + (uint32_t) mul_144_c[b];
                         bitmap[tmp] = (pixel & 0xff000000) + (bw << 16) + (bw << 8) + (bw);
