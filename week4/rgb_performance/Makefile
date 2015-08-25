@@ -1,4 +1,4 @@
-BIN = toGray_v0 toGray_v1 toGray_v2 toGray_v3
+BIN = toGray_v0 toGray_v1 toGray_v2 toGray_v3 toGray_v4
 
 CFLAGS = -Wall -Werror -std=gnu99 -O0 -g
 LDFLAGS = `pkg-config --libs --cflags libpng`
@@ -16,6 +16,9 @@ toGray_v2: main.c
 
 toGray_v3: main.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -DTOGRAY_V3
+
+toGray_v4: main.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -DTOGRAY_V4
 
 clean:
 	$(RM) $(BIN) gray_v*.png

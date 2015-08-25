@@ -134,6 +134,33 @@ void rgba_to_bw_v3(uint32_t *bitmap, int width, int height, long stride)
         }
 }
 
+/* optimize version v4
+ *
+ * change:
+ *
+ *  1. for i++   -> for i--
+ *  2. int tmp = col + row * stride / 4;
+ *  3. use table for: bw = (uint32_t) (r * 0.299 + g * 0.587 + b * 0.114);
+ *  4. reduce table size
+ */
+void rgba_to_bw_v4(uint32_t *bitmap, int width, int height, long stride)
+{
+        int row, col;
+        uint32_t pixel, r, g, b,  bw;
+        for (row = height - 1; row + 1 != 0; row--) {
+                for (col = width - 1; col + 1 != 0; col--) {
+                        int tmp = col + row * stride / 4;
+                        pixel = bitmap[tmp];
+                        //a = (pixel >> 24) & 0xff;
+                        r = (pixel & 0x00ff0000) >> 21; // 16 + 5
+                        g = (pixel & 0x0000ff00) >> 13;  // 8 + 5
+                        b = (pixel & 0x000000ff) >> 5;
+                        bw = (uint32_t) mul_299_c[r] + (uint32_t) mul_587_c[g] + (uint32_t) mul_144_c[b];
+                        bitmap[tmp] = (pixel & 0xff000000) + (bw << 16) + (bw << 8) + (bw);
+                }
+        }
+}
+
 void read_image(const char* filename)
 {
         FILE *fp = fopen(filename, "rb");
@@ -263,6 +290,11 @@ void process_image()
 #elif defined(TOGRAY_V3)
 #define OUTPUT "gray_v3.png"
         rgba_to_bw_v3((uint32_t *) *row_pointers, width, height, stride);
+
+#elif defined(TOGRAY_V4)
+#define OUTPUT "gray_v4.png"
+        rgba_to_bw_v4((uint32_t *) *row_pointers, width, height, stride);
+
 #else
 #error "See makefile"
 #endif
