@@ -316,8 +316,8 @@ int main(int argc, char *argv[])
 #if 0
         int r = 0;
         for (int i = 0; i < 256; i++) {
-                r = i * 0.587;
-                //r = i * 0.114;
+                r = i * 0.299;
+                //r = i * 0.587;
                 //r = i * 0.114;
                 printf("%d, ", r);
         }
